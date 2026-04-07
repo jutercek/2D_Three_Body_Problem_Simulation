@@ -4,8 +4,11 @@ the simulation and visualization pipeline.
 Does not contain any physics or render logic.
 """
 import matplotlib
+matplotlib.use("TkAgg")
 
-
+import numpy as np
+# from simulation import Body, get_preset, run_simulation  !!! Code this
+# from visualizer import animate_simulation  !!! Code this
 
 # Validation constants
 
@@ -17,45 +20,70 @@ VELOCITY_MAX   =   50.0
 MIN_SEPARATION =    5.0
 
 
-# Input functions
+# ----- Input functions -----
 
-def prompt_float() -> float:
+def prompt_float(prompt: str, min_val: float = None,
+                    max_val: float = None) -> float:
     """
-    Prompt the user for a float until a valid value is entered.
+    Prompt the user for a float, until a valid value is entered.
     Optionally enforces min/max bounds.
     """
-
-    return value
+    while True:
+        try:
+            value = float(input(prompt))
+        except ValueError:
+            print("  Invalid input — please enter a number.")
+            continue
+        if min_val is not None and value < min_val:
+            print(f"  Value must be >= {min_val}.")
+            continue
+        if max_val is not None and value > max_val:
+            print(f"  Value must be <= {max_val}.")
+            continue
+        return value
 
 
 def prompt_mode() -> str:
     """
     Ask the user to choose between preset and custom mode.
-
-    Returns
-    -------
-    str
-        One of "preset" or "custom".
     """
     print("\n--- Three-Body Problem Simulator ---\n")
     print("  [1] Use a stable preset configuration")
     print("  [2] Enter custom initial conditions")
 
+    while True:
+        choice = input("\nSelect mode (1 or 2): ").strip()
+        if choice == "1":
+            return "preset"
+        elif choice == "2":
+            return "custom"
+        else:
+            print("  Please enter 1 or 2.")
+
 
 def prompt_preset() -> str:
     """
-    Display the preset options and return the user's choice.
+    Display the three preset options and return the user's choice.
+
+    Returns
+    -------
+    str
+        One of "figure8", "lagrange", "hierarchical".
     """
     print("\nAvailable presets:\n")
+    print("  [1] Figure-8       — three equal masses chasing each other")
+    print("  [2] Lagrange       — equilateral triangle, rigid rotation")
+    print("  [3] Hierarchical   — close binary pair orbited by a third body")
 
-    options = {}
+    options = {"1": "figure8", "2": "lagrange", "3": "hierarchical"}
 
     while True:
-        choice = input("\nSelect preset").strip()
+        choice = input("\nSelect preset (1, 2 or 3): ").strip()
         if choice in options:
             return options[choice]
         else:
-            print("")
+            print("  Please enter 1, 2 or 3.")
+
 
 
 
@@ -106,15 +134,59 @@ def prompt_custom_bodies() -> list[Body]:
 def prompt_save() -> str | None:
     """
     Ask the user whether to save the animation and if so, to what path.
+
+    Returns
+    -------
+    str or None
+        File path (e.g. "output.gif") or None to display interactively.
     """
+    print("  [1] Display animation interactively")
+    print("  [2] Save as .gif  (requires Pillow)")
+    print("  [3] Save as .mp4  (requires ffmpeg)")
+
+    while True:
+        choice = input("\nOutput option (1, 2 or 3): ").strip()
+        if choice == "1":
+            return None
+        elif choice == "2":
+            path = input("  Save path (e.g. output.gif): ").strip()
+            if not path.endswith(".gif"):
+                path += ".gif"
+            return path
+        elif choice == "3":
+            path = input("  Save path (e.g. output.mp4): ").strip()
+            if not path.endswith(".mp4"):
+                path += ".mp4"
+            return path
+        else:
+            print("  Please enter 1, 2 or 3.")
+
 
 def validate_separations(bodies: list[Body]) -> None:
     """
     Check that no two bodies start closer than MIN_SEPARATION.
-    Prints a warning — lets the user decide whether
+    Prints a warning but does not block — lets the user decide whether
     to proceed knowing it may cause numerical issues.
     """
+    for i in range(3):
+        for j in range(i + 1, 3):
+            delta = bodies[j].position - bodies[i].position
+            dist  = np.linalg.norm(delta)
+            if dist < MIN_SEPARATION:
+                print(
+                    f"\n  WARNING: {bodies[i].name} and {bodies[j].name} "
+                    f"are only {dist:.2f} units apart (minimum recommended: "
+                    f"{MIN_SEPARATION}). This may cause numerical instability."
+                )
 
 
 # Main
+
+def main() -> None:
+    """
+    Run the full user interaction → simulation → animation pipeline.
+    """
+
+if __name__ == "__main__":
+    main()
 
