@@ -7,29 +7,18 @@ import numpy as np
 
 # ----- Constants -----
 
-G = 1.0          # Gravitational constant (simulation units)
+G = 1.0          # Gravitational constant in simulation units
+SOFTENING = 0.02  # Softening to avoid singularities at close range
 
 # ----- Physics core -----
 
 def gravitational_force(pos1: np.ndarray, pos2: np.ndarray,
                         mass1: float, mass2: float) -> np.ndarray:
-    """
-    Compute the gravitational force vector exerted on body 1 by body 2.
 
-    Parameters
-    ----------
-    pos1 : np.ndarray, shape (2,)
-        Position of body 1 [x, y].
-    pos2 : np.ndarray, shape (2,)
-        Position of body 2 [x, y].
-    mass1 : float
-        Mass of body 1.
-    mass2 : float
-        Mass of body 2.
-
-    Returns
-    -------
-    """
+    delta = pos2 - pos1
+    dist = np.sqrt(np.dot(delta, delta) + SOFTENING ** 2)
+    force_magnitude = G * mass1 * mass2 / dist ** 2
+    return force_magnitude * (delta / dist)
 
 def compute_accelerations(positions: np.ndarray,
                            masses: np.ndarray) -> np.ndarray:
@@ -44,35 +33,56 @@ def compute_accelerations(positions: np.ndarray,
 
 def rk4_step(positions: np.ndarray, velocities: np.ndarray,
              masses: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Advance positions and velocities by one timestep using RK4 integration.
 
-    Parameters
-    ----------
-    positions : np.ndarray, shape (3, 2)
-        Current positions of the three bodies.
-    velocities : np.ndarray, shape (3, 2)
-        Current velocities of the three bodies.
-    masses : np.ndarray, shape (3,)
-        Masses of the three bodies.
-    dt : float
-        Timestep size.
+    # k1
+    k1_v = compute_accelerations(positions, masses)
+    k1_x = velocities
 
-    Returns
-    -------
-    tuple[np.ndarray, np.ndarray]
-        (new_positions, new_velocities), each shape (3, 2).
-    """
+    # k2
+    k2_v = compute_accelerations(positions + 0.5 * dt * k1_x, masses)
+    k2_x = velocities + 0.5 * dt * k1_v
+
+    # k3
+    k3_v = compute_accelerations(positions + 0.5 * dt * k2_x, masses)
+    k3_x = velocities + 0.5 * dt * k2_v
+
+    # k4
+    k4_v = compute_accelerations(positions + dt * k3_x, masses)
+    k4_x = velocities + dt * k3_v
+
+    new_positions  = positions  + (dt / 6.0) * (k1_x + 2*k2_x + 2*k3_x + k4_x)
+    new_velocities = velocities + (dt / 6.0) * (k1_v + 2*k2_v + 2*k3_v + k4_v)
+
+    return new_positions, new_velocities
 
 
 # ----- Diagnostics -----
 
 def compute_total_energy(positions: np.ndarray, velocities: np.ndarray,
                          masses: np.ndarray) -> float:
-    """
-    Compute the total mechanical energy (kinetic + potential) of the system.
-    """
-# compute_center_of_mass
+
+    # Kinetic energy
+    ke = 0.0
+    for i in range(3):
+        ke += 0.5 * masses[i] * np.dot(velocities[i], velocities[i])
+
+    # Potential energy
+    pe = 0.0
+    for i in range(3):
+        for j in range(i + 1, 3):
+            delta = positions[j] - positions[i]
+            dist = np.sqrt(np.dot(delta, delta) + SOFTENING ** 2)
+            pe -= G * masses[i] * masses[j] / dist
+
+    return ke + pe
+
+
+
+def compute_center_of_mass(positions: np.ndarray,
+                           masses: np.ndarray) -> np.ndarray:
+
+    return np.sum(masses[:, np.newaxis] * positions, axis=0) / np.sum(masses)
+
 
 
 # ----- Termination checks -----

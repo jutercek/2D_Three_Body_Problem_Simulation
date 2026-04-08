@@ -10,7 +10,7 @@ import numpy as np
 # from simulation import Body, get_preset, run_simulation  !!! Code this
 # from visualizer import animate_simulation  !!! Code this
 
-# Validation constants
+# ----- Constants -----
 
 MASS_MIN       =   1e-3
 MASS_MAX       =   1e6
@@ -62,14 +62,7 @@ def prompt_mode() -> str:
 
 
 def prompt_preset() -> str:
-    """
-    Display the three preset options and return the user's choice.
 
-    Returns
-    -------
-    str
-        One of "figure8", "lagrange", "hierarchical".
-    """
     print("\nAvailable presets:\n")
     print("  [1] Figure-8       — three equal masses chasing each other")
     print("  [2] Lagrange       — equilateral triangle, rigid rotation")
@@ -88,15 +81,7 @@ def prompt_preset() -> str:
 
 
 def prompt_custom_bodies() -> list[Body]:
-    """
-    Interactively collect mass, position, and velocity for each of
-    the three bodies from the user.
 
-    Returns
-    -------
-    list[Body]
-        Three fully initialised Body instances.
-    """
     bodies = []
     print("\nEnter initial conditions for each body.")
     print(f"  Mass      : {MASS_MIN} to {MASS_MAX}")
@@ -132,14 +117,7 @@ def prompt_custom_bodies() -> list[Body]:
 
 
 def prompt_save() -> str | None:
-    """
-    Ask the user whether to save the animation and if so, to what path.
 
-    Returns
-    -------
-    str or None
-        File path (e.g. "output.gif") or None to display interactively.
-    """
     print("  [1] Display animation interactively")
     print("  [2] Save as .gif  (requires Pillow)")
     print("  [3] Save as .mp4  (requires ffmpeg)")
@@ -163,11 +141,7 @@ def prompt_save() -> str | None:
 
 
 def validate_separations(bodies: list[Body]) -> None:
-    """
-    Check that no two bodies start closer than MIN_SEPARATION.
-    Prints a warning but does not block — lets the user decide whether
-    to proceed knowing it may cause numerical issues.
-    """
+
     for i in range(3):
         for j in range(i + 1, 3):
             delta = bodies[j].position - bodies[i].position
