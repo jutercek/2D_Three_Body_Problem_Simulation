@@ -86,5 +86,24 @@ def compute_center_of_mass(positions: np.ndarray,
 
 
 # ----- Termination checks -----
-# check collision
-# check out of bounds
+
+def check_collision(positions: np.ndarray,
+                    collision_radius: float = 0.5) -> tuple[bool, int, int]:
+
+    for i in range(3):
+        for j in range(i + 1, 3):
+            delta = positions[j] - positions[i]
+            dist = np.sqrt(np.dot(delta, delta))
+            if dist < collision_radius:
+                return True, i, j
+    return False, -1, -1
+
+
+
+def check_escape(positions: np.ndarray,
+                 boundary: float = 500.0) -> tuple[bool, int]:
+
+    for i in range(3):
+        if np.any(np.abs(positions[i]) > boundary):
+            return True, i
+    return False, -1

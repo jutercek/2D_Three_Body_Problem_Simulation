@@ -1,5 +1,5 @@
 """
-Assert-based tests for physics.py file functions.
+Assert-based tests for physics.py file functions
 """
 
 import numpy as np
@@ -12,11 +12,13 @@ from physics import (
     compute_center_of_mass,
     G,
     SOFTENING,
+    check_collision,
+    check_escape
 )
 
 
 def test_gravitational_force_direction():
-    """Force on body 1 must point toward 2."""
+    """Force on body 1 must point toward 2"""
     pos1 = np.array([0.0, 0.0])
     pos2 = np.array([1.0, 0.0])
     force = gravitational_force(pos1, pos2, mass1=1.0, mass2=1.0)
@@ -26,7 +28,7 @@ def test_gravitational_force_direction():
     print("PASSED test_gravitational_force_direction")
 
 def test_gravitational_force_newtons_third_law():
-    """Force on body 1 from 2 must be equal and opposite to force on 2 from 1."""
+    """Force on body 1 from 2 must be equal and opposite to force on 2 from 1"""
     pos1 = np.array([0.0, 0.0])
     pos2 = np.array([3.0, 4.0])
     mass1, mass2 = 2.0, 5.0
@@ -39,7 +41,7 @@ def test_gravitational_force_newtons_third_law():
     print("PASSED test_gravitational_force_newtons_third_law")
 
 def test_gravitational_force_magnitude():
-    """Force magnitude should match F = G*m1*m2*r / (r^2 + softening^2)^(3/2)."""
+    """Force magnitude should match F"""
     pos1 = np.array([0.0, 0.0])
     pos2 = np.array([3.0, 0.0])
     mass1, mass2 = 1.0, 1.0
@@ -65,12 +67,77 @@ def test_gravitational_force_no_singularity():
     )
     print("PASSED test_gravitational_force_no_singularity")
 
+def test_rk4_step_returns_correct_shape():
+    """RK4 must return two arrays of shape (3, 2)"""
+    positions  = np.random.rand(3, 2)
+    velocities = np.random.rand(3, 2)
+    masses     = np.array([1.0, 1.0, 1.0])
+    new_pos, new_vel = rk4_step(positions, velocities, masses, dt=0.01)
+
+    assert new_pos.shape == (3, 2), f"new_positions shape wrong: {new_pos.shape}"
+    assert new_vel.shape == (3, 2), f"new_velocities shape wrong: {new_vel.shape}"
+    print("PASSED test_rk4_step_returns_correct_shape")
+
+def test_rk4_energy_conservation():
+    """Total energy must remain approximately constant over a short simulation"""
+    positions = np.array([
+        [-5.0,  0.0],
+        [ 5.0,  0.0],
+        [ 0.0,  5.0],
+    ])
+    velocities = np.array([
+        [ 0.0,  0.5],
+        [ 0.0, -0.5],
+        [ 0.5,  0.0],
+    ])
+    masses = np.array([1.0, 1.0, 1.0])
+    e0 = compute_total_energy(positions, velocities, masses)
+    for _ in range(500):
+        positions, velocities = rk4_step(positions, velocities, masses, dt=0.01)
+
+    e1 = compute_total_energy(positions, velocities, masses)
+    relative_drift = abs(e1 - e0) / abs(e0)
+
+    assert relative_drift < 0.01, (
+        f"Energy drift too large: {relative_drift:.4%} (initial={e0:.4f}, final={e1:.4f})"
+    )
+    print("PASSED test_rk4_energy_conservation")
+
+
+def test_check_collision_detected():
+    """A collision must be detected when two bodies are within collision radius"""
+    positions = np.array([
+        [0.0, 0.0],
+        [1.0, 0.0],
+        [50.0, 50.0],
+    ])
+    collided, i, j = check_collision(positions, collision_radius=2.0)
+
+    assert collided, "Collision should have been detected"
+    assert set([i, j]) == {0, 1}, f"Wrong bodies reported: {i}, {j}"
+    print("PASSED test_check_collision_detected")
+
+# ADD collision NOT_detected? Do I need it?
+
+def test_check_escape_detected():
+    """Escape must be detected when a body exceeds the boundary"""
+    positions = np.array([
+        [  0.0,   0.0],
+        [600.0,   0.0],
+        [  0.0,  10.0],
+    ])
+    escaped, idx = check_escape(positions, boundary=500.0)
+
+    assert escaped, "Escape should have been detected"
+    assert idx == 1, f"Wrong body reported as escaped: {idx}"
+    print("PASSED test_check_escape_detected")
+
+# Should also add NOT_detected for escape?
+
 # def test_compute_accelerations_symmetry():
 # def test_compute_accelerations_total_force_zero()
-# def test_rk4():
-# test_rk4_energy_cons():
 # test_center_of_mass_equal_masses():
-# test_check_collision():
+# test_com_weighted():
 # test_check_escape():
 
 
