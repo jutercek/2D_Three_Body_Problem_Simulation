@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use("TkAgg")
 
 import numpy as np
-# from simulation import Body, get_preset, run_simulation  !!! Code this
+from simulation import Body, get_preset, run_simulation
 # from visualizer import animate_simulation  !!! Code this
 
 # ----- Constants -----
@@ -110,6 +110,7 @@ def prompt_custom_bodies() -> list[Body]:
             f"  Velocity vy: ",
             min_val=-VELOCITY_MAX, max_val=VELOCITY_MAX
         )
+        # still works with list?
         bodies.append(Body(mass, [x, y], [vx, vy], f"Body {i + 1}"))
         print()
 
@@ -154,12 +155,34 @@ def validate_separations(bodies: list[Body]) -> None:
                 )
 
 
-# Main
+# ----- Main -----
 
 def main() -> None:
     """
     Run the full user interaction → simulation → animation pipeline.
     """
+    mode = prompt_mode()
+
+    if mode == "preset":
+        preset_name = prompt_preset()
+        bodies = get_preset(preset_name)
+        print(f"\nLoaded preset: {preset_name}")
+    else:
+        bodies = prompt_custom_bodies()
+        validate_separations(bodies)
+
+    save_path = prompt_save()
+
+    print("\nRunning simulation ...")
+    result = run_simulation(bodies)
+
+    print(f"  {result['message']}")
+    print(f"  Steps run: {result['steps']}")
+
+    print("\nPreparing animation ...")
+    animate_simulation(result, save_path=save_path) # Still have to code in visualizer!!
+
+
 
 if __name__ == "__main__":
     main()
