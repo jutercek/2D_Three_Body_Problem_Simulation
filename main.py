@@ -8,7 +8,7 @@ matplotlib.use("TkAgg")
 
 import numpy as np
 from simulation import Body, get_preset, run_simulation
-# from visualizer import animate_simulation  !!! Code this
+from visualizer import animate_simulation
 
 # ----- Constants -----
 
