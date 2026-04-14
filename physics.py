@@ -20,9 +20,11 @@ def gravitational_force(pos1: np.ndarray, pos2: np.ndarray,
     force_magnitude = G * mass1 * mass2 / dist ** 2
     return force_magnitude * (delta / dist)
 
+
 def compute_accelerations(positions: np.ndarray,
                            masses: np.ndarray) -> np.ndarray:
     accelerations = np.zeros((3, 2))
+
     for i in range(3):
         for j in range(3):
             if i != j:
@@ -30,6 +32,7 @@ def compute_accelerations(positions: np.ndarray,
                 dist = np.sqrt(np.dot(delta, delta) + SOFTENING ** 2)
                 accelerations[i] += G * masses[j] * delta / dist ** 3
     return accelerations
+
 
 def rk4_step(positions: np.ndarray, velocities: np.ndarray,
              masses: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
@@ -60,7 +63,6 @@ def rk4_step(positions: np.ndarray, velocities: np.ndarray,
 
 def compute_total_energy(positions: np.ndarray, velocities: np.ndarray,
                          masses: np.ndarray) -> float:
-
     # Kinetic energy
     ke = 0.0
     for i in range(3):
@@ -77,12 +79,9 @@ def compute_total_energy(positions: np.ndarray, velocities: np.ndarray,
     return ke + pe
 
 
-
 def compute_center_of_mass(positions: np.ndarray,
                            masses: np.ndarray) -> np.ndarray:
-
     return np.sum(masses[:, np.newaxis] * positions, axis=0) / np.sum(masses)
-
 
 
 # ----- Termination checks -----
@@ -97,7 +96,6 @@ def check_collision(positions: np.ndarray,
             if dist < collision_radius:
                 return True, i, j
     return False, -1, -1
-
 
 
 def check_escape(positions: np.ndarray,

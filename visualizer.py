@@ -13,10 +13,9 @@ TRAIL_LENGTH = 200 # steps of trail to show
 BODY_SCALE = 100 # base scatter marker size
 
 # ----- Internal -----
+
 def _get_writer(path: str):
-    """
-    Return an appropriate animation writer based on the file extension
-    """
+    """Return an appropriate animation writer based on the file extension."""
     ext = path.rsplit(".", 1)[-1].lower()
 
     if ext == "gif":
@@ -33,9 +32,7 @@ def _get_writer(path: str):
 
 def compute_axis_limits(positions: np.ndarray,
                         padding: float = 5.0) -> tuple[float, float, float, float]:
-    """
-    Compute symmetric axis limits from the full trajectory
-    """
+    """Compute symmetric axis limits from the full trajectory."""
     x_all = positions[:, :, 0]
     y_all = positions[:, :, 1]
     x_min = x_all.min() - padding
@@ -52,10 +49,11 @@ def compute_axis_limits(positions: np.ndarray,
     return (x_mid - max_range / 2, x_mid + max_range / 2,
             y_mid - max_range / 2, y_mid + max_range / 2)
 
+
 def animate_simulation(result: dict, save_path: str = None) -> None:
     """
-    Render and display the animation
-    Optionally save to file
+    Render and display the animation.
+    Optionally save the file.
     """
     positions = result["positions"]   # shape (n_steps, 3, 2)
     masses    = result["masses"]

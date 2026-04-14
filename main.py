@@ -67,7 +67,6 @@ def prompt_preset() -> str:
     print("  [1] Figure-8       — three equal masses chasing each other")
     print("  [2] Lagrange       — equilateral triangle, rigid rotation")
     print("  [3] Hierarchical   — close binary pair orbited by a third body")
-
     options = {"1": "figure8", "2": "lagrange", "3": "hierarchical"}
 
     while True:
@@ -76,8 +75,6 @@ def prompt_preset() -> str:
             return options[choice]
         else:
             print("  Please enter 1, 2 or 3.")
-
-
 
 
 def prompt_custom_bodies() -> list[Body]:
@@ -113,7 +110,6 @@ def prompt_custom_bodies() -> list[Body]:
         # still works with list?
         bodies.append(Body(mass, [x, y], [vx, vy], f"Body {i + 1}"))
         print()
-
     return bodies
 
 
@@ -175,13 +171,10 @@ def main() -> None:
 
     print("\nRunning simulation ...")
     result = run_simulation(bodies)
-
     print(f"  {result['message']}")
     print(f"  Steps run: {result['steps']}")
-
     print("\nPreparing animation ...")
     animate_simulation(result, save_path=save_path) # Still have to code in visualizer!!
-
 
 
 if __name__ == "__main__":

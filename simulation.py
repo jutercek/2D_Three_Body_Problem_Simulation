@@ -1,7 +1,6 @@
 # add test_simulation.py for coverage?
 
 import numpy as np
-
 from physics import (
     rk4_step,
     compute_center_of_mass,
@@ -17,9 +16,7 @@ G_preset = 1.0 # Gravitational constant for preset calc
 # ----- Body -----
 
 class Body:
-    """
-    A class to represent a single body in the simulation
-    """
+    """A class to represent a single body in the simulation."""
     def __init__(self, mass: float, position: np.ndarray,
                  velocity: np.ndarray, name: str = "Body"):
         self.mass = mass
@@ -27,13 +24,14 @@ class Body:
         self.velocity = np.array(velocity, dtype=float)
         self.name = name
 
+
 # ----- Simulation -----
 
 def run_simulation(bodies: list[Body]) -> dict:
     """"
     Run 3 Body simulation from set initial conditions
-    until termination condition is met
-    Positions stored in center of mass frame so animation stays centered
+    until termination condition is met.
+    Positions stored in center of mass frame so animation stays centered.
     """
 
     bodies: list[Body]
@@ -84,6 +82,7 @@ def run_simulation(bodies: list[Body]) -> dict:
         "status":    status,
         "message":   message
     }
+
 
 # ----- Preset code -----
 
