@@ -5,7 +5,9 @@ The project is split into five Python files, each with a single responsibility. 
 
 main.py
 ├── simulation.py
+
 │   └── physics.py
+
 └── visualizer.py
 
 test_physics.py    → physics.py
