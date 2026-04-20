@@ -40,6 +40,6 @@ Running tests
 Run tests_physics.py file.
 
 Example of the results:
-Below is shown an example of the animation output for the case of the Preset 1 setting.
+Below is shown an example of the animation output for the case of the Figure-8 setting.
 <img width="583" height="433" alt="Preset1" src="https://github.com/user-attachments/assets/4e48c404-4372-4a67-ae68-ddaecc697900" />
 
