@@ -174,7 +174,7 @@ def main() -> None:
     print(f"  {result['message']}")
     print(f"  Steps run: {result['steps']}")
     print("\nPreparing animation ...")
-    animate_simulation(result, save_path=save_path) # Still have to code in visualizer!!
+    animate_simulation(result, save_path=save_path)
 
 
 if __name__ == "__main__":
