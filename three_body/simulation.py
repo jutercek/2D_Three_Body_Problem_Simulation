@@ -1,7 +1,7 @@
 # add test_simulation.py for coverage?
 
 import numpy as np
-from physics import (
+from three_body.physics import (
     rk4_step,
     compute_center_of_mass,
     check_collision,

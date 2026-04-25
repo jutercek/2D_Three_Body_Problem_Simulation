@@ -4,7 +4,7 @@ Assert-based tests for physics.py file functions
 
 import numpy as np
 
-from physics import (
+from three_body.physics import (
     gravitational_force,
     compute_accelerations,
     rk4_step,
