@@ -16,9 +16,7 @@ from three_body.physics import (
     SOFTENING,
 )
 
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
+# ----- Fix -----
 
 @pytest.fixture
 def equal_masses():
@@ -49,9 +47,7 @@ def collinear_horizontal():
     return pos1, pos2
 
 
-# ---------------------------------------------------------------------------
-# gravitational_force
-# ---------------------------------------------------------------------------
+# ----- Gravitational_force -----
 
 class TestGravitationalForce:
 
@@ -115,3 +111,43 @@ class TestGravitationalForce:
         f_far  = np.linalg.norm(gravitational_force(pos1, pos_far,  1.0, 1.0))
 
         assert f_near > f_far
+
+# ----- TestComputeAccel -----
+
+class TestComputeAccelerations:
+
+    def test_net_force_on_system_is_zero(self, equal_masses):
+        """
+        The sum of mass times acceleration over all bodies must be zero
+        """
+        positions, _, masses = equal_masses
+        accels = compute_accelerations(positions, masses)
+        net_force = np.sum(masses[:, np.newaxis] * accels, axis=0)
+
+        assert np.allclose(net_force, 0.0, atol=1e-10)
+
+    def test_equal_acceleration_magnitudes_in_symmetric_config(self):
+        """
+        Three equal masses at the corners of an equilateral triangle
+        must experience equal acceleration magnitudes
+        """
+        s = 10.0
+        positions = np.array([
+            [0.0,              0.0],
+            [s,                0.0],
+            [s / 2.0, s * np.sqrt(3) / 2.0],
+        ])
+        masses = np.array([1.0, 1.0, 1.0])
+        accels = compute_accelerations(positions, masses)
+        magnitudes = np.linalg.norm(accels, axis=1)
+
+        assert np.allclose(magnitudes, magnitudes[0], rtol=1e-6)
+
+    def test_output_shape(self, equal_masses):
+        """
+        Output must be shape (3, 2)
+        """
+        positions, _, masses = equal_masses
+        accels = compute_accelerations(positions, masses)
+
+        assert accels.shape == (3, 2)
