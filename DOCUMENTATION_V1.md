@@ -1,31 +1,4 @@
 # Code Documentation
-## Overview
-
-The project is split into five Python files, each with a single responsibility. "main.py" calls "simulation.py" and "visualizer.py", "simulation.py" calls "physics.py", and the test files import from "physics.py". Nothing imports from "main.py".
-
-main.py
-├── simulation.py
-
-│   └── physics.py
-
-└── visualizer.py
-
-test_physics.py    → physics.py
-test_simulation.py → simulation.py # not yet implemented
-
-
-## physics.py
-
-Contains all the pure physics — force calculations, numerical integration, energy computation, and termination checks. No simulation state is stored here and there is no user I/O. Every function takes arrays in and returns arrays out, which makes them straightforward to test in isolation.
-
-### Constants
-
-G = 1.0
-SOFTENING = 0.01
-
-"G" is the gravitational constant set to 1.0, meaning the simulation runs in dimensionless units rather than SI. This keeps the numbers manageable and lets the preset initial conditions use clean values.
-
-"SOFTENING" is a small value added inside the distance calculation to prevent the gravitational force from becoming infinite when two bodies get very close. Without it, a collision would produce a force so large it would make the integrator unstable. The value 0.01 was chosen by trial and error. 0.1 was too coarse for the figure-8 preset which requires bodies to pass close to each other.
 
 ### gravitational_force(pos1, pos2, mass1, mass2)
 
