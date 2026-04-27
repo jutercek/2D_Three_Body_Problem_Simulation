@@ -6,6 +6,7 @@ The three-body problem describes the motion of three masses interacting through 
 This program simulates the three-body problem in 2D. The user inputs initial masses, positions and velocities for three bodies, and the program computes their equations of motion using a 4th order Runge-Kutta method and outputs an animation of the trajectories.
 
 As custom inputs of starting conditions can lead to non stable solutions, three stable preset configurations are also included for reference.
+
 ## Program structure
 ```
 three_body_sim/
@@ -22,7 +23,7 @@ three_body_sim/
   ├── README.md
   └── DOCUMENTATION.md
 ```
-The project uses dimensionless units G = 1 for simplicity, and not SI.
+The project uses dimensionless units G = 1 for simplicity, and not SI. The program assumes point masses and solely gravitational interactions wihtout relativistic effects.
 
 `physics.py` contains all core physics functions. It handles gravitational force calculations between body pairs, numerical integration using RK4, total energy computation, and collision and escape checks. It does not store any simulation states. Functions take arrays in and return arrays out, making them easier to test in isolation.
 
@@ -33,6 +34,21 @@ The project uses dimensionless units G = 1 for simplicity, and not SI.
 `main.py` is the entry point of the program. It handles all user interaction. Prompting for mode selection, collecting and validating custom initial conditions, and choosing output format. It contains no physics or rendering logic, it only connects other modules.
 
 `test_physics.py` contains the pytest test suites for `physics.py`. Tests verify physical correctness using known analytical results and fundamental laws rather than reimplementing the code being tested.
+
+### Simulation Parameters
+
+These constants are defined at the top of their respective files. Tunable parameters can be adjusted directly in the source code.
+
+| Parameter | File | Default | Tunable | Description |
+|---|---|---|---|---|
+| `G` | `physics.py` | `1.0` | No | Gravitational constant in simulation units |
+| `SOFTENING` | `physics.py` | `0.02` | Yes | Softening length to prevent singularities at close range |
+| `COLLISION_RADIUS` | `physics.py` | `0.5` | Yes | Distance threshold below which a collision is declared |
+| `BOUNDARY` | `physics.py` | `500.0` | Yes | Distance from origin beyond which a body is considered escaped |
+| `DT` | `simulation.py` | `0.01` | Yes | Timestep size (smaller is more accurate but slower) |
+| `MAX_STEPS` | `simulation.py` | `5000` | Yes | Maximum number of integration steps per simulation |
+| `TRAIL_LENGTH` | `visualizer.py` | `200` | Yes | Number of past positions shown as trail per body |
+| `BODY_SCALE` | `visualizer.py` | `100` | Yes | Controls scale of bodies rendered in animation |
 
 ## Program usage tutorial
 ### Requirements
