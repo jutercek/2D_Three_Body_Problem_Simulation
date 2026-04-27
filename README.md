@@ -22,14 +22,15 @@ three_body_sim/
   ├── README.md
   └── DOCUMENTATION.md
 ```
+The project uses dimensionless units G = 1 for simplicity, and not SI.
 
-`physics.py` contains all core physics functions. It handles gravitational force calculations between body pairs, numerical integration using RK4, total energy computation, and collision and escape checks. It does not sotre any simulation states. Functions take arrays in and return arrays out, making them easier to test in isolation.
+`physics.py` contains all core physics functions. It handles gravitational force calculations between body pairs, numerical integration using RK4, total energy computation, and collision and escape checks. It does not store any simulation states. Functions take arrays in and return arrays out, making them easier to test in isolation.
 
-`simulation.py` holds the time evolution of the system. It defines the `Body` class for storing initial conditions, calls funcitons from `physics.py`, runs the integration loop and checks termination conditions after each step. It also contains the three preset configurations. When the simulation finishes it returns the trajectory data as a dictionary for the visualizer.
+`simulation.py` holds the time evolution of the system. It defines the `Body` class for storing initial conditions, calls functions from `physics.py`, runs the integration loop and checks termination conditions after each step. It also contains the three preset configurations. When the simulation finishes it returns the trajectory data as a dictionary for the visualizer.
 
 `visualizer.py` takes the trajectory data produced by `simulation.py` and renders it as a matplotlib animation. It handles axis scaling, trail rendering, body marker sizing, and saving the output to `.gif` or `.mp4`. 
 
-`main.py` is the entry point of the program. It handles all user interaction. Prompting for mode selection, collecting and validating custom initial conditions, and choosing output format. It contains no physics or rendering logic, it only connects other moduels..
+`main.py` is the entry point of the program. It handles all user interaction. Prompting for mode selection, collecting and validating custom initial conditions, and choosing output format. It contains no physics or rendering logic, it only connects other modules.
 
 `test_physics.py` contains the pytest test suites for `physics.py`. Tests verify physical correctness using known analytical results and fundamental laws rather than reimplementing the code being tested.
 
