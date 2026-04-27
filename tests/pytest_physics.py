@@ -17,7 +17,9 @@ from three_body.physics import (
 )
 
 # ----- Fix -----
-
+"""
+equal_masses and collinear_horizontal defined here so they can be called later without repeating code
+"""
 @pytest.fixture
 def equal_masses():
     """
@@ -112,7 +114,7 @@ class TestGravitationalForce:
 
         assert f_near > f_far
 
-# ----- TestComputeAccel -----
+# ----- ComputeAccelerations -----
 
 class TestComputeAccelerations:
 
@@ -151,3 +153,92 @@ class TestComputeAccelerations:
         accels = compute_accelerations(positions, masses)
 
         assert accels.shape == (3, 2)
+
+# ----- RK4 steps -----
+
+class TestRK4Step:
+
+    def test_output_shapes(self, equal_masses):
+        """
+        RK4 must return two arrays of shape (3, 2), one position and one velocity
+        """
+        positions, velocities, masses = equal_masses
+        new_pos, new_vel = rk4_step(positions, velocities, masses, dt=0.01)
+
+        assert new_pos.shape == (3, 2)
+        assert new_vel.shape == (3, 2)
+
+    def test_energy_conservation_over_short_run(self, equal_masses):
+        """
+        Total mechanical energy must remain approximately constant
+        over 500 steps with dt=0.01. RK4 is not perfectly symplectic
+        so some drift is expected
+        """
+        positions, velocities, masses = equal_masses
+        e0 = compute_total_energy(positions, velocities, masses)
+
+        for _ in range(500):
+            positions, velocities = rk4_step(positions, velocities, masses, dt=0.01)
+
+        e1 = compute_total_energy(positions, velocities, masses)
+        relative_drift = abs(e1 - e0) / abs(e0)
+
+        assert relative_drift < 0.01
+
+    def test_positions_change_after_step(self, equal_masses):
+        """
+        Positions must change after a timestep
+        """
+        positions, velocities, masses = equal_masses
+        new_pos, _ = rk4_step(positions, velocities, masses, dt=0.01)
+
+        assert not np.allclose(new_pos, positions)
+
+# ----- Total energy -----
+
+class TestComputeTotalEnergy:
+
+    def test_energy_is_scalar(self, equal_masses):
+        """
+        Total energy must be a float
+        """
+        positions, velocities, masses = equal_masses
+        energy = compute_total_energy(positions, velocities, masses)
+
+        assert isinstance(energy, float)
+
+    def test_kinetic_energy_only_for_distant_bodies(self):
+        """
+        For two bodies separated by a large distance, potential energy
+        goes to zero and total energy approaches kinetic energy
+        """
+        positions = np.array([
+            [  0.0, 0.0],
+            [1e6,   0.0],
+            [2e6,   0.0],
+        ])
+        velocities = np.array([
+            [1.0, 0.0],
+            [2.0, 0.0],
+            [3.0, 0.0],
+        ])
+        masses = np.array([1.0, 1.0, 1.0])
+
+        energy = compute_total_energy(positions, velocities, masses)
+        expected_ke = 0.5 * (1.0 + 4.0 + 9.0)  # 0.5 * m * v^2 for each
+
+        assert abs(energy - expected_ke) < 1e-3
+
+    def test_stationary_bodies_have_negative_energy(self):
+        """
+        Three stationary bodies have zero kinetic energy and negative
+        potential energy
+        Total energy must be negative
+        """
+        positions  = np.array([[0.0, 0.0], [5.0, 0.0], [0.0, 5.0]])
+        velocities = np.zeros((3, 2))
+        masses     = np.array([1.0, 1.0, 1.0])
+
+        energy = compute_total_energy(positions, velocities, masses)
+
+        assert energy < 0
