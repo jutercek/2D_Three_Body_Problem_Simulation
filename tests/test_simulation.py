@@ -49,3 +49,30 @@ def escape_bodies():
         Body(1.0, [ 10.0, 0.0], [ 0.0, 0.0], "Body 2"),
         Body(1.0, [-10.0, 0.0], [50.0, 0.0], "Body 3"),
     ]
+
+# ----- Body -----
+
+class TestBody:
+
+    def test_stores_attributes_correctly(self):
+        """
+        Body must store mass, position, velocity and name
+        exactly as provided on construction
+        """
+        b = Body(2.5, [1.0, -3.0], [0.5, 0.1], "Test")
+
+        assert b.mass == 2.5
+        assert np.allclose(b.position, [1.0, -3.0])
+        assert np.allclose(b.velocity, [0.5, 0.1])
+        assert b.name == "Test"
+
+    def test_position_and_velocity_are_numpy_arrays(self):
+        """
+        Position and velocity must be stored as numpy arrays
+        """
+        b = Body(1.0, [1.0, 2.0], [0.0, 0.0])
+
+        assert isinstance(b.position, np.ndarray)
+        assert isinstance(b.velocity, np.ndarray)
+
+
