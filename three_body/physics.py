@@ -9,6 +9,8 @@ import numpy as np
 
 G = 1.0          # Gravitational constant in simulation units
 SOFTENING = 0.02  # Softening to avoid singularities at close range
+COLLISION_RADIUS = 0.5 # For collision check
+BOUNDARY         = 500.0 # For escape check
 
 # ----- Physics core -----
 
@@ -87,7 +89,7 @@ def compute_center_of_mass(positions: np.ndarray,
 # ----- Termination checks -----
 
 def check_collision(positions: np.ndarray,
-                    collision_radius: float = 0.5) -> tuple[bool, int, int]:
+                    collision_radius=COLLISION_RADIUS) -> tuple[bool, int, int]:
 
     for i in range(3):
         for j in range(i + 1, 3):
@@ -99,7 +101,7 @@ def check_collision(positions: np.ndarray,
 
 
 def check_escape(positions: np.ndarray,
-                 boundary: float = 500.0) -> tuple[bool, int]:
+                 boundary=BOUNDARY) -> tuple[bool, int]:
 
     for i in range(3):
         if np.any(np.abs(positions[i]) > boundary):
