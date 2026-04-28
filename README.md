@@ -33,7 +33,7 @@ The project uses dimensionless units G = 1 for simplicity, and not SI. The progr
 
 `main.py` is the entry point of the program. It handles all user interaction. Prompting for mode selection, collecting and validating custom initial conditions, and choosing output format. It contains no physics or rendering logic, it only connects other modules.
 
-`test_physics.py` contains the pytest test suites for `physics.py`. Tests verify physical correctness using known analytical results and fundamental laws rather than reimplementing the code being tested.
+`test_physics.py` and `test_simulation.py` contain the pytest test suites for `physics.py` and `simulation.py`. Tests verify physical correctness using known analytical results and fundamental laws rather than reimplementing the code being tested.
 
 ### Simulation Parameters
 
