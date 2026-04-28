@@ -46,8 +46,8 @@ def escape_bodies():
     """
     return [
         Body(1.0, [  0.0, 0.0], [ 0.0, 0.0], "Body 1"),
-        Body(1.0, [ 10.0, 0.0], [ 0.0, 0.0], "Body 2"),
-        Body(1.0, [-10.0, 0.0], [50.0, 0.0], "Body 3"),
+        Body(1.0, [ 0.0, 50.0], [ 0.0, 0.0], "Body 2"),
+        Body(1.0, [0.0, -50.0], [200.0, 0.0], "Body 3"),
     ]
 
 # ----- Body -----
@@ -75,4 +75,140 @@ class TestBody:
         assert isinstance(b.position, np.ndarray)
         assert isinstance(b.velocity, np.ndarray)
 
+# ----- Simulation Structure -----
 
+class TestRunSimulationStructure:
+
+    def test_returns_dict_with_all_keys(self, simple_bodies):
+        """
+        run_simulation must return a dict containing all expected keys
+        """
+        result = run_simulation(simple_bodies)
+        expected_keys = {"positions", "masses", "names", "steps", "status", "message"}
+
+        assert expected_keys == set(result.keys())
+
+    def test_positions_shape(self, simple_bodies):
+        """
+        Trajectory array must be shape (n_steps, 3, 2)
+        """
+        result = run_simulation(simple_bodies)
+        positions = result["positions"]
+
+        assert positions.ndim == 3
+        assert positions.shape[1] == 3
+        assert positions.shape[2] == 2
+
+    def test_steps_matches_trajectory_length(self, simple_bodies):
+        """
+        The step count must equal the number of frames
+        in the trajectory array (must stay in sync for the
+        visualizer to animate correctly)
+        """
+        result = run_simulation(simple_bodies)
+
+        assert result["positions"].shape[0] == result["steps"]
+
+    def test_masses_shape(self, simple_bodies):
+        """
+        Masses array must be shape (3,)
+        """
+        result = run_simulation(simple_bodies)
+
+        assert result["masses"].shape == (3,)
+
+    def test_names_match_input_bodies(self, simple_bodies):
+        """
+        Names in the result must match the names of the input Body instances
+        """
+        result = run_simulation(simple_bodies)
+
+        assert len(result["names"]) == 3
+        for i, name in enumerate(result["names"]):
+            assert name == simple_bodies[i].name
+
+# ----- Termination conditions -----
+
+class TestRunSimulationTermination:
+
+    def test_stable_config_completes_normally(self, simple_bodies):
+        """
+        A stable configuration must run to MAX_STEPS
+        and report status 'completed' with no termination
+        """
+        result = run_simulation(simple_bodies)
+
+        assert result["status"] == "completed"
+
+    def test_collision_termination(self, collision_bodies):
+        """
+        Two bodies within collision radius must trigger status 'collision'
+        The termination message must confirm which bodies collided
+        """
+        result = run_simulation(collision_bodies)
+
+        assert result["status"] == "collision"
+        assert "collided" in result["message"].lower()
+
+    def test_escape_termination(self, escape_bodies):
+        """
+        A body with velocity sufficient to exceed the boundary must trigger status 'escape'
+        The termination message must confirm which body escaped
+        """
+        result = run_simulation(escape_bodies)
+
+        assert result["status"] == "escape"
+        assert "escaped" in result["message"].lower()
+
+    def test_collision_stops_simulation_early(self, collision_bodies):
+        """
+        A collision must stop the simulation before MAX_STEPS is reached
+        """
+        from three_body.simulation import MAX_STEPS
+        result = run_simulation(collision_bodies)
+
+        assert result["steps"] < MAX_STEPS
+
+
+# ----- Physics checks simulation -----
+
+class TestRunSimulationPhysics:
+
+    def test_center_of_mass_at_origin(self, simple_bodies):
+        """
+        Trajectories are stored in the center of mass frame
+        The mass-weighted average position at any frame must be
+        at the origin within numerical precision
+        """
+        result = run_simulation(simple_bodies)
+        positions = result["positions"]
+        masses    = result["masses"]
+
+        for frame_idx in [0, -1]:
+            frame = positions[frame_idx]
+            com = np.sum(masses[:, np.newaxis] * frame, axis=0) / np.sum(masses)
+            assert np.allclose(com, 0.0, atol=1e-6)
+
+
+# ----- preset -----
+
+class TestGetPreset:
+
+    @pytest.mark.parametrize("name", ["figure8", "lagrange", "hierarchical"])
+    def test_returns_three_body_instances(self, name):
+        """
+        Every preset must return exactly three Body instances
+        """
+        bodies = get_preset(name)
+
+        assert len(bodies) == 3
+        for b in bodies:
+            assert isinstance(b, Body)
+
+
+    def test_invalid_preset_raises_value_error(self):
+        """
+        get_preset must raise ValueError for an unrecognised name
+        """
+        with pytest.raises(ValueError):
+            get_preset("nonexistent")
