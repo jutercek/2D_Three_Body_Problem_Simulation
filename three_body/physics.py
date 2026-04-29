@@ -25,16 +25,19 @@ def gravitational_force(pos1: np.ndarray, pos2: np.ndarray,
 
 def compute_accelerations(positions: np.ndarray,
                            masses: np.ndarray) -> np.ndarray:
-    accelerations = np.zeros((3, 2))
 
-    for i in range(3):
-        for j in range(3):
-            if i != j:
-                delta = positions[j] - positions[i]
-                dist = np.sqrt(np.dot(delta, delta) + SOFTENING ** 2)
-                accelerations[i] += G * masses[j] * delta / dist ** 3
+    diff = positions[np.newaxis, :, :] - positions[:, np.newaxis, :]
+    # compute softened distances for pairs
+    dist_sq = np.sum(diff ** 2, axis=2) + SOFTENING ** 2
+    dist_cu = dist_sq ** 1.5
+
+    # compute accelerations as mass weighted sum over all other bodies
+    # divide by dist_cu to get direction and magnitude in one step
+    accelerations = G * np.sum(
+        masses[np.newaxis, :, np.newaxis] * diff / dist_cu[:, :, np.newaxis],
+        axis=1
+    )
     return accelerations
-
 
 def rk4_step(positions: np.ndarray, velocities: np.ndarray,
              masses: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
