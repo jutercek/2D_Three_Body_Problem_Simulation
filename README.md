@@ -20,12 +20,15 @@ three_body_sim/
      ├── test_physics.py
      └── test_simulation.py
   ├── main.py
+  ├── benchmark.py
   ├── README.md
   └── DOCUMENTATION.md
 ```
 The project uses dimensionless units G = 1 for simplicity, and not SI. The program assumes point masses and solely gravitational interactions wihtout relativistic effects.
 
 `physics.py` contains all core physics functions. It handles gravitational force calculations between body pairs, numerical integration using RK4, total energy computation, and collision and escape checks. It does not store any simulation states. Functions take arrays in and return arrays out, making them easier to test in isolation.
+
+`benchmark.py` tests execution time difference of old loop based compute_accelerations function and new vectorized version. 
 
 `simulation.py` holds the time evolution of the system. It defines the `Body` class for storing initial conditions, calls functions from `physics.py`, runs the integration loop and checks termination conditions after each step. It also contains the three preset configurations. When the simulation finishes it returns the trajectory data as a dictionary for the visualizer.
 
@@ -67,13 +70,13 @@ These constants are defined at the top of their respective files. Tunable parame
 - If using a preset, select one of the three available configurations: Figure-8, Lagrange triangle, or Hierarchical
 - If using custom input, enter mass, position (x, y) and velocity (vx, vy) for each of the three bodies when prompted
 - Select output option:
-   - Sisplay interactively
+   - Display interactively
    - Save as `.gif`
    - Save as `.mp4`
 - If saving, enter the desired file name when prompted
 
 ### Running tests
-Run `pytest_physics.py`
+Run `test_physics.py` and `test_simulation.py`.
 
 ## Examples
 Examples of animation outputs
