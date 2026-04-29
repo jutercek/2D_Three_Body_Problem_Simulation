@@ -27,7 +27,22 @@ def prompt_float(prompt: str, min_val: float = None,
     """
     Prompt the user for a float, until a valid value is entered.
     Optionally enforces min/max bounds.
+
+    Parameters
+    -
+    prompt : str
+        Message displayed to the user.
+    min_val : float, optional
+        Minimum allowed value.
+    max_val : float, optional
+        Maximum allowed value.
+
+    Returns
+    -
+    float
+        Validated float value within the specified bounds.
     """
+
     while True:
         try:
             value = float(input(prompt))
@@ -62,6 +77,14 @@ def prompt_mode() -> str:
 
 
 def prompt_preset() -> str:
+    """
+    Display the three preset options and return the user's choice as a string.
+
+    Returns
+    -
+    str
+        One of: figure8, lagrange, hierarchical.
+    """
 
     print("\nAvailable presets:\n")
     print("  [1] Figure-8       — three equal masses chasing each other")
@@ -78,6 +101,15 @@ def prompt_preset() -> str:
 
 
 def prompt_custom_bodies() -> list[Body]:
+    """
+    Interactively collect mass, position and velocity for each of the three
+    bodies from the user.
+
+    Returns
+    -
+    list[Body]
+        Three fully initialized Body instances.
+    """
 
     bodies = []
     print("\nEnter initial conditions for each body.")
@@ -114,6 +146,14 @@ def prompt_custom_bodies() -> list[Body]:
 
 
 def prompt_save() -> str | None:
+    """
+    Ask the user whether to save the animation and if so, to what path.
+
+    Returns
+    -
+    str or None
+        File path string (e.g. output.gif) or None to display interactively.
+    """
 
     print("  [1] Display animation interactively")
     print("  [2] Save as .gif  (requires Pillow)")
@@ -138,6 +178,15 @@ def prompt_save() -> str | None:
 
 
 def validate_separations(bodies: list[Body]) -> None:
+    """
+    Check that no two bodies start closer than MIN_SEPARATION.
+    Prints a warning but does not block execution.
+
+    Parameters
+    -
+    bodies : list[Body]
+        List of three Body instances with positions set.
+    """
 
     for i in range(3):
         for j in range(i + 1, 3):
