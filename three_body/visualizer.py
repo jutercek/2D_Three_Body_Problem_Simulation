@@ -15,7 +15,25 @@ BODY_SCALE = 100 # base scatter marker size
 # ----- Internal -----
 
 def _get_writer(path: str):
-    """Return an appropriate animation writer based on the file extension."""
+    """
+    Return an appropriate animation writer based on the file extension.
+
+    Parameters
+    -
+    path : str
+        Output file path. Extension determines the writer used.
+
+    Returns
+    -
+    animation.PillowWriter or animation.FFMpegWriter
+        Writer instance for .gif or .mp4 respectively.
+
+    Raises
+    -
+    ValueError
+        If the file extension is not .gif or .mp4.
+    """
+
     ext = path.rsplit(".", 1)[-1].lower()
 
     if ext == "gif":
@@ -32,7 +50,21 @@ def _get_writer(path: str):
 
 def compute_axis_limits(positions: np.ndarray,
                         padding: float = 5.0) -> tuple[float, float, float, float]:
-    """Compute symmetric axis limits from the full trajectory."""
+    """
+    Compute symmetric axis limits from the full trajectory.
+
+    Parameters
+    -
+    positions : np.ndarray, shape (n_steps, 3, 2)
+        Full trajectory in center-of-mass frame.
+    padding : float
+        Extra space added beyond the trajectory extents on all sides.
+
+    Returns
+    -
+    tuple[float, float, float, float]
+        (x_min, x_max, y_min, y_max)
+    """
     x_all = positions[:, :, 0]
     y_all = positions[:, :, 1]
     x_min = x_all.min() - padding
@@ -54,6 +86,15 @@ def animate_simulation(result: dict, save_path: str = None) -> None:
     """
     Render and display the animation.
     Optionally save the file.
+
+    Parameters
+    -
+    result : dict
+        Dictionary returned by run_simulation(). Expected keys:
+        positions, masses, names, steps, status, message.
+    save_path : str or None
+        File path to save the animation (e.g. output.gif or output.mp4).
+        If None the animation is displayed interactively.
     """
     positions = result["positions"]   # shape (n_steps, 3, 2)
     masses    = result["masses"]
@@ -97,6 +138,7 @@ def animate_simulation(result: dict, save_path: str = None) -> None:
 
     # Update()
     def update(frame: int):
+        """Update trail and body marker position for each body at given frame."""
         trail_start = max(0, frame - TRAIL_LENGTH)
 
         for i in range(3):

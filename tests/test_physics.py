@@ -1,5 +1,11 @@
 """
 pytest for physics.py
+
+Tests verify physical correctness using known analytical results
+and fundamental physical laws.
+
+Run with:
+    pytest tests/test_physics.py -v
 """
 
 import numpy as np
@@ -17,9 +23,8 @@ from three_body.physics import (
 )
 
 # ----- Fix -----
-"""
-equal_masses and collinear_horizontal defined here so they can be called later without repeating code
-"""
+# Fixtures are shared test configurations injected into tests automatically by pytest
+
 @pytest.fixture
 def equal_masses():
     """
@@ -49,7 +54,7 @@ def collinear_horizontal():
     return pos1, pos2
 
 
-# ----- Gravitational_force -----
+# ----- GravitationalForce -----
 
 class TestGravitationalForce:
 
@@ -154,7 +159,7 @@ class TestComputeAccelerations:
 
         assert accels.shape == (3, 2)
 
-# ----- RK4 steps -----
+# ----- RK4Steps -----
 
 class TestRK4Step:
 
@@ -194,7 +199,7 @@ class TestRK4Step:
 
         assert not np.allclose(new_pos, positions)
 
-# ----- Total energy -----
+# ----- TotalEnergy -----
 
 class TestComputeTotalEnergy:
 
@@ -243,7 +248,7 @@ class TestComputeTotalEnergy:
 
         assert energy < 0
 
-# ----- Center of mass -----
+# ----- CenterOfMass -----
 
 class TestComputeCenterOfMass:
 
@@ -286,7 +291,7 @@ class TestComputeCenterOfMass:
 
         assert com.shape == (2,)
 
-# ----- Collision check -----
+# ----- CollisionCheck -----
 
 class TestCheckCollision:
 
@@ -331,7 +336,7 @@ class TestCheckCollision:
         assert j == -1
 
 
-# ----- Check escape -----
+# ----- CheckEscape -----
 
 class TestCheckEscape:
 

@@ -1,5 +1,11 @@
 """
 pytest for simulation.py
+
+Tests verify the simulation loop, termination conditions,
+Body class, and preset configurations.
+
+Run with:
+    pytest tests/test_simulation.py -v
 """
 
 import numpy as np
@@ -7,10 +13,7 @@ import pytest
 from three_body.simulation import Body, run_simulation, get_preset
 
 # ----- Fix -----
-"""
-These functions are repeatedly called in multiple tests
-Writen here as to not repeat code later
-"""
+# Fixtures are shared test configurations injected into tests automatically by pytest
 
 @pytest.fixture
 def simple_bodies():
@@ -75,7 +78,7 @@ class TestBody:
         assert isinstance(b.position, np.ndarray)
         assert isinstance(b.velocity, np.ndarray)
 
-# ----- Simulation Structure -----
+# ----- SimulationStructure -----
 
 class TestRunSimulationStructure:
 
@@ -127,14 +130,14 @@ class TestRunSimulationStructure:
         for i, name in enumerate(result["names"]):
             assert name == simple_bodies[i].name
 
-# ----- Termination conditions -----
+# ----- TerminationConditions -----
 
 class TestRunSimulationTermination:
 
     def test_stable_config_completes_normally(self, simple_bodies):
         """
-        A stable configuration must run to MAX_STEPS
-        and report status 'completed' with no termination
+        A stable configuration must report status 'completed',
+        meaning no collision or escape was triggered.
         """
         result = run_simulation(simple_bodies)
 
@@ -170,7 +173,7 @@ class TestRunSimulationTermination:
         assert result["steps"] < MAX_STEPS
 
 
-# ----- Physics checks simulation -----
+# ----- PhysicsChecksSimulation -----
 
 class TestRunSimulationPhysics:
 
@@ -190,7 +193,7 @@ class TestRunSimulationPhysics:
             assert np.allclose(com, 0.0, atol=1e-6)
 
 
-# ----- preset -----
+# ----- Preset -----
 
 class TestGetPreset:
 
@@ -212,3 +215,16 @@ class TestGetPreset:
         """
         with pytest.raises(ValueError):
             get_preset("nonexistent")
+
+    @pytest.mark.parametrize("name", ["figure8", "lagrange", "hierarchical"])
+    def test_preset_runs_more_than_ten_steps(self, name):
+        """
+        Every preset must simulate for more than 10 steps without
+        immediately colliding or escaping.
+        """
+        bodies = get_preset(name)
+        result = run_simulation(bodies)
+
+        assert result["steps"] > 10, (
+            f"Preset '{name}' terminated at step {result['steps']}: {result['message']}"
+        )
