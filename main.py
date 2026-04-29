@@ -61,6 +61,11 @@ def prompt_float(prompt: str, min_val: float = None,
 def prompt_mode() -> str:
     """
     Ask the user to choose between preset and custom mode.
+
+    Returns
+    -
+    str
+        One of: preset, custom.
     """
     print("\n--- Three-Body Problem Simulator ---\n")
     print("  [1] Use a stable preset configuration")

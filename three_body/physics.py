@@ -73,6 +73,7 @@ def compute_accelerations(positions: np.ndarray,
     )
     return accelerations
 
+
 def rk4_step(positions: np.ndarray, velocities: np.ndarray,
              masses: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
     """
