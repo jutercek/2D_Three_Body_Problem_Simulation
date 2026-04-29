@@ -21,8 +21,7 @@ three_body_sim/
      └── test_simulation.py
   ├── main.py
   ├── benchmark.py
-  ├── README.md
-  └── DOCUMENTATION.md
+  └── README.md
 ```
 The project uses dimensionless units G = 1 for simplicity, and not SI. The program assumes point masses and solely gravitational interactions wihtout relativistic effects.
 
@@ -76,14 +75,12 @@ These constants are defined at the top of their respective files. Tunable parame
 - If saving, enter the desired file name when prompted
 
 ### Running tests
-Run `test_physics.py` and `test_simulation.py`.
+pytest tests/ -v
 
 ## Examples
 Examples of animation outputs
 
-A interactive 2D simulator for the gravitational three-body problem, written in Python as part of a Software and Computing for Applied Physics course. The program numerically integrates Newton's equations of motion using a 4th-order Runge-Kutta (RK4) method and outputs an animation of the resulting trajectories.
-
-Example of the results:
+### Example of the results
 Below is shown an example of the animation output for the case of the Figure-8 setting.
 <img width="583" height="433" alt="Preset1" src="https://github.com/user-attachments/assets/4e48c404-4372-4a67-ae68-ddaecc697900" />
 
