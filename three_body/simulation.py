@@ -16,7 +16,21 @@ G_preset = 1.0 # Gravitational constant for preset calc
 # ----- Body -----
 
 class Body:
-    """A class to represent a single body in the simulation."""
+    """
+    A class to represent a single body in the simulation.
+
+    Attributes
+    -
+    mass : float
+        Mass of the body.
+    position : np.ndarray, shape (2,)
+        Initial position [x, y].
+    velocity : np.ndarray, shape (2,)
+        Initial velocity [vx, vy].
+    name : str
+        Lable to display.
+    """
+
     def __init__(self, mass: float, position: np.ndarray,
                  velocity: np.ndarray, name: str = "Body"):
         self.mass = mass
@@ -28,13 +42,33 @@ class Body:
 # ----- Simulation -----
 
 def run_simulation(bodies: list[Body]) -> dict:
-    """"
+    """
     Run 3 Body simulation from set initial conditions
     until termination condition is met.
     Positions stored in center of mass frame so animation stays centered.
+
+    Parameters
+    -
+    bodies : list[Body]
+        List of exactly three Body instances with initial conditions set.
+
+    Returns
+    -
+    dict with keys:
+        positions : np.ndarray, shape (n_steps, 3, 2)
+            Full trajectory in center-of-mass frame.
+        masses : np.ndarray, shape (3,)
+            Masses of the three bodies.
+        names : list[str]
+            Display names of the three bodies.
+        steps : int
+            Number of steps actually run.
+        status : str
+            Termination reason, one of: completed, collision, escape.
+        message : str
+            Human-readable termination message.
     """
 
-    bodies: list[Body]
     assert len(bodies) == 3, "Simulation requires exactly 3 bodies."
     positions  = np.array([b.position for b in bodies])
     velocities = np.array([b.velocity for b in bodies])
@@ -87,6 +121,25 @@ def run_simulation(bodies: list[Body]) -> dict:
 # ----- Preset code -----
 
 def get_preset(name: str) -> list[Body]:
+    """
+    Return three Body instances configured for a named stable configuration.
+
+    Parameters
+    -
+    name : str
+        One of figure8, lagrange, hierarchical.
+
+    Returns
+    -
+    list[Body]
+        Three Body instances with positions and velocities set.
+
+    Raises
+    -
+    ValueError
+        If name is not a known preset.
+    """
+
     if name == "figure8":
         # Chenciner and Montgomery figure-8 solution
         # Three equal masses chasing each other along a figure-8 curve
