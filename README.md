@@ -10,6 +10,8 @@ As custom inputs of starting conditions can lead to non stable solutions, three 
 ## Program structure
 ```
 three_body_sim/
+  ├── assets/
+     └── figure8.gif
   ├── three_body/
      ├── __init__.py
      ├── physics.py
